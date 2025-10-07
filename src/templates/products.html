@@ -1,0 +1,78 @@
+{% extends "base.html"%}
+{% block title %}{{ category_name }} | Sneakers Shop{% endblock %}
+{% block content %}
+    <!-- ***** Main Banner Area Start ***** -->
+    <div class="page-heading" id="top">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="inner-content">
+                        <h2>{% if category_name %}{{ category_name | title }}{% else %}Check Our Products{% endif %}</h2>
+                        {% if category_description %}<span>{{ category_description }}</span>{% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ***** Main Banner Area End ***** -->
+
+
+    <!-- ***** Products Area Starts ***** -->
+    <section class="section" id="products">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="section-heading">
+                        <h2>Our Latest Products</h2>
+                        <span>Check out all of our products.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="row">
+                {% for product in products %}
+                <div class="col-lg-4">
+                    <div class="item">
+                        <div class="thumb">
+                            <div class="hover-content">
+                                <ul>
+                                    <li><a href="/product/{{ product.code }}"><i class="fa fa-eye"></i></a></li>
+                                    <li><a href="/product/{{ product.code }}"><i class="fa fa-star"></i></a></li>
+                                    <li><a href="/product/{{ product.code }}"><i class="fa fa-shopping-cart"></i></a></li>
+                                </ul>
+                            </div>
+                            <img src="{{ product.images[0] }}" alt="">
+                        </div>
+                        <div class="down-content">
+                            <h4>{{ product.name }}</h4>
+                            <span>${{ product.price }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+                <div class="col-lg-12">
+                    <div class="pagination">
+                        <ul>
+                            {% set url = page_type %}
+                            {% if has_prev %}
+                            <li>
+                                <a href="/{{ url }}?page={{ prev_page }}"><</a>
+                            </li>
+                            {% endif %}
+                            {% for page_num in page_numbers %}
+                                <li {% if current_page == page_num %}class="active"{% endif %}><a href="/{{ url}}?page={{ page_num }}">{{ page_num }}</a></li>
+                            {% endfor %}
+                            {% if has_next %}
+                            <li>
+                                <a href="/{{ url }}?page={{ next_page }}">></a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- ***** Products Area Ends ***** -->
+{% endblock %}

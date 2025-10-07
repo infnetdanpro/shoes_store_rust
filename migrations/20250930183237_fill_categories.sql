@@ -1,0 +1,1 @@
+INSERT INTO categories (name) VALUES ('men'), ('woman'), ('kids'), ('accessories');

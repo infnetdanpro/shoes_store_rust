@@ -1,0 +1,18 @@
+[package]
+name = "test_shop_rust"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+tokio = { version = "1.47.1", features = ["full"] }
+minijinja = { version = "2.12.0", features = ["builtins"] }
+minijinja-embed = "2.12.0"
+serde = { version = "1.0.227", features = ["derive"] }
+sqlx = { version = "0.8", features = [ "runtime-tokio", "postgres" ] }
+tower-http = {version = "0.6.6", features = ["fs"]}
+axum = "0.8.4"
+home = "0.5.11"
+dotenv = "0.15.0"
+
+[build-dependencies]
+minijinja-embed = "2.12.0"
