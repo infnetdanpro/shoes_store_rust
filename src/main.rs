@@ -1,6 +1,7 @@
 mod config;
 mod db;
 mod models;
+mod repository;
 mod router;
 mod views;
 
