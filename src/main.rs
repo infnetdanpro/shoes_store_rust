@@ -21,6 +21,7 @@ async fn main() {
     let tcp_listener = tokio::net::TcpListener::bind(format!("{addr}:{port}"))
         .await
         .unwrap();
+    println!("Listening on http://{}:{}", addr, port);
     axum::serve(tcp_listener, app_router.into_make_service())
         .await
         .unwrap();

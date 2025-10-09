@@ -21,12 +21,12 @@
         <div class="container">
             <div class="row">
                 <div class="col-lg-8">
-                <div class="left-images">
-                    {% for image in product.images %}
-                        <img src="{{ image }}" alt="">
-                    {% endfor %}
+                    <div class="left-images">
+                        {% for image in product.images %}
+                            <img src="{{ image }}" alt="">
+                        {% endfor %}
+                    </div>
                 </div>
-            </div>
             <div class="col-lg-4">
                 <div class="right-content">
                     <h4>{{ product.name }}</h4>
