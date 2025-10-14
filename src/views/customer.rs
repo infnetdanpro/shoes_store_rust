@@ -20,7 +20,6 @@ pub async fn post_customer_registration_page(
     Extension(pool): Extension<PgPool>,
     Form(customer): Form<NewCustomer>,
 ) -> Html<String> {
-    println!("{:?}", customer);
     let mut form_errors = HashMap::new();
     match customer.accept_all {
         AcceptEnum::Off => {
@@ -47,5 +46,11 @@ pub async fn post_customer_registration_page(
     let r = template
         .render(context!(form_errors => form_errors))
         .unwrap();
+    Html(r)
+}
+
+pub async fn get_profile_customer_page(State(state): State<Arc<AppState>>) -> Html<String> {
+    let template = state.tpl_env.get_template("index.html").unwrap();
+    let r = template.render(context!()).unwrap();
     Html(r)
 }

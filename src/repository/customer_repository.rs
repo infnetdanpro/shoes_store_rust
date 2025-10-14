@@ -1,5 +1,5 @@
 use crate::models::customer::NewCustomer;
-use bcrypt::{DEFAULT_COST, hash, verify};
+use bcrypt::{DEFAULT_COST, hash};
 use chrono::NaiveTime;
 use sqlx::{Error, PgPool};
 

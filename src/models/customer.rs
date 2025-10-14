@@ -26,3 +26,8 @@ pub struct NewCustomer {
     #[serde(default = "default_accept_enum")]
     pub(crate) accept_all: AcceptEnum,
 }
+
+#[derive(Deserialize, Serialize, Debug)]
+pub struct Customer {
+    pub(crate) id: i32,
+}

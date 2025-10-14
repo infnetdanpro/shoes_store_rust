@@ -1,17 +1,27 @@
+use crate::middlewares::extract_user_id_from_cookie;
 use crate::models::state::AppState;
 use crate::views::{
-    about::about, customer::get_customer_registration_page,
+    about::about, customer::get_customer_registration_page, customer::get_profile_customer_page,
     customer::post_customer_registration_page, home::home, order::get_order_by_uuid_and_customer,
     products::get_product_by_code, products::get_products, products::get_products_by_category_name,
 };
 use axum::routing::get;
-use axum::{Extension, Router};
+use axum::{Extension, Router, middleware};
 use minijinja::Environment;
+use simple_cookie::SigningKey;
 use sqlx::PgPool;
 use std::sync::Arc;
 use tower_http::services::ServeDir;
 
-pub fn create_router(pool: PgPool, static_files: ServeDir, env: Environment<'static>) -> Router {
+pub fn create_router(
+    pool: PgPool,
+    static_files: ServeDir,
+    env: Environment<'static>,
+    signing_key: SigningKey,
+) -> Router {
+    let protected_routes = Router::new()
+        .route("/profile", get(get_profile_customer_page))
+        .layer(middleware::from_fn(extract_user_id_from_cookie));
     Router::new()
         .route("/", get(home))
         .route("/about", get(about))
@@ -28,7 +38,8 @@ pub fn create_router(pool: PgPool, static_files: ServeDir, env: Environment<'sta
             get(get_customer_registration_page).post(post_customer_registration_page),
         )
         // .route("/login", get(get_customer_registration_page))
-        .layer(Extension(pool))
+        .merge(protected_routes)
+        .layer((Extension(pool), Extension(signing_key)))
         .with_state(Arc::new(AppState { tpl_env: env }))
         .nest_service("/static", static_files)
 }
