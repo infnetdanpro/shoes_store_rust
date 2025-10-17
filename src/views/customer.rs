@@ -42,7 +42,7 @@ pub async fn post_customer_registration_page(
             headers.insert("Set-Cookie", cookie_value.parse().unwrap());
         }
         Err(e) => {
-            println!("Error register NewCustomer: {}", e);
+            println!("Error register NewCustomer: {:?}", e);
             form_errors.insert(
                 "error",
                 "Error register customer user, please send this to the support",

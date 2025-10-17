@@ -36,8 +36,7 @@ WHERE rn <= $1;",
         )
         .bind(limit)
         .fetch_all(pool)
-        .await
-        .unwrap();
+        .await?;
 
         let mut map_products: HashMap<String, Vec<ProductsWithCategory>> = HashMap::new();
 
@@ -91,8 +90,8 @@ limit $2;"#,
             .fetch_one(pool)
         );
 
-        let products = product_results.unwrap();
-        let cnt_products = count_results.unwrap();
+        let products = product_results?;
+        let cnt_products = count_results?;
         let count: i64 = cnt_products.get("count");
         let mut ctx_products: Vec<Product> = Vec::with_capacity(products.len());
 
@@ -153,8 +152,8 @@ where c.is_active = true and c.name = $1;"#
             .fetch_one(pool)
         );
 
-        let products = products_result.unwrap();
-        let cnt_products = count_result.unwrap();
+        let products = products_result?;
+        let cnt_products = count_result?;
         let count: i64 = cnt_products.get("count");
 
         let mut ctx_products: Vec<Product> = Vec::with_capacity(products.len());
@@ -200,8 +199,7 @@ from products where code = $1;",
         )
         .bind(code)
         .fetch_one(pool)
-        .await
-        .unwrap();
+        .await?;
 
         Ok(FullProduct {
             id: product.get("id"),

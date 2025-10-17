@@ -24,7 +24,7 @@ pub async fn extract_user_id_from_cookie(
                     req.extensions_mut().insert(customer);
                     Ok(next.run(req).await)
                 }
-                Err(e) => Err((StatusCode::INTERNAL_SERVER_ERROR, format!("{}", e))),
+                Err(e) => Err((StatusCode::INTERNAL_SERVER_ERROR, format!("{:?}", e))),
             }
         }
         Err((status, _)) => Err((

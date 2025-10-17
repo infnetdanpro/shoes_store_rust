@@ -3,7 +3,7 @@ use simple_cookie::{SigningKey, decode_cookie, encode_cookie};
 pub struct AuthService;
 
 impl AuthService {
-    pub fn create_cookie_header(customer_id: i32, signing_key: &SigningKey) -> String {
+    pub fn create_cookie_header(customer_id: i64, signing_key: &SigningKey) -> String {
         let encoded = encode_cookie(
             *signing_key,
             "customer_id",

@@ -1,7 +1,32 @@
 use crate::models::customer::{NewCustomer, ProfileCustomer};
 use bcrypt::{DEFAULT_COST, hash};
 use chrono::NaiveTime;
-use sqlx::{Error, PgPool};
+use sqlx::PgPool;
+
+#[derive(Debug)]
+pub enum CustomerError {
+    Database,
+    HashingError,
+    MissingData(String),
+}
+
+impl std::fmt::Display for CustomerError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            CustomerError::Database => write!(f, "Database error occurred"),
+            CustomerError::HashingError => write!(f, "Password hashing failed"),
+            CustomerError::MissingData(field) => write!(f, "Missing required field: {}", field),
+        }
+    }
+}
+
+impl std::error::Error for CustomerError {}
+
+impl From<sqlx::Error> for CustomerError {
+    fn from(_e: sqlx::Error) -> Self {
+        CustomerError::Database
+    }
+}
 
 pub struct CustomerRepository;
 
@@ -9,40 +34,47 @@ impl CustomerRepository {
     pub async fn verify_customer(
         pool: &PgPool,
         customer_id: i32,
-    ) -> Result<ProfileCustomer, Error> {
-        let result = sqlx::query!(
+    ) -> Result<ProfileCustomer, CustomerError> {
+        let customer = sqlx::query!(
             "SELECT id, email, first_name, last_name FROM customers WHERE id = $1", // is_enabled/is_deleted/ or something
             customer_id as i64
         )
         .fetch_one(pool)
-        .await;
-        match result {
-            Ok(customer) => Ok(ProfileCustomer {
-                id: customer.id,
-                email: customer.email,
-                first_name: customer.first_name.expect("Empty First Name"),
-                last_name: customer.last_name.expect("Empty Last Name"),
-            }),
-            Err(e) => Err(e),
-        }
+        .await?;
+
+        Ok(ProfileCustomer {
+            id: customer.id,
+            email: customer.email,
+            first_name: customer
+                .first_name
+                .ok_or_else(|| CustomerError::MissingData("First Name is required".to_string()))?,
+            last_name: customer
+                .last_name
+                .ok_or_else(|| CustomerError::MissingData("Last Name is required".to_string()))?,
+        })
     }
-    pub async fn create_customer(pool: &PgPool, new_customer: NewCustomer) -> Result<i32, Error> {
-        let hashed_pwd = hash(&new_customer.password, DEFAULT_COST).unwrap();
+
+    pub async fn create_customer(
+        pool: &PgPool,
+        new_customer: NewCustomer,
+    ) -> Result<i64, CustomerError> {
+        let hashed_pwd =
+            hash(&new_customer.password, DEFAULT_COST).map_err(|_| CustomerError::HashingError)?;
         let date_time = new_customer
             .date_birth
             .and_time(NaiveTime::from_hms_opt(0, 0, 0).unwrap());
 
         let result = sqlx::query!(
             "INSERT INTO customers (
-                       email,
-                       date_birth,
-                       country,
-                       city,
-                       first_name,
-                       last_name,
-                       phone,
-                       password
-               ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id;",
+                           email,
+                           date_birth,
+                           country,
+                           city,
+                           first_name,
+                           last_name,
+                           phone,
+                           password
+                   ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id;",
             new_customer.email,
             date_time,
             new_customer.country,
@@ -53,11 +85,8 @@ impl CustomerRepository {
             hashed_pwd
         )
         .fetch_one(pool)
-        .await;
+        .await?;
 
-        match result {
-            Ok(result) => Ok(result.id as i32),
-            Err(e) => Err(e),
-        }
+        Ok(result.id)
     }
 }
