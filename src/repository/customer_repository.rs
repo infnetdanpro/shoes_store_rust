@@ -1,4 +1,4 @@
-use crate::models::customer::NewCustomer;
+use crate::models::customer::{NewCustomer, ProfileCustomer};
 use bcrypt::{DEFAULT_COST, hash};
 use chrono::NaiveTime;
 use sqlx::{Error, PgPool};
@@ -6,6 +6,26 @@ use sqlx::{Error, PgPool};
 pub struct CustomerRepository;
 
 impl CustomerRepository {
+    pub async fn verify_customer(
+        pool: &PgPool,
+        customer_id: i32,
+    ) -> Result<ProfileCustomer, Error> {
+        let result = sqlx::query!(
+            "SELECT id, email, first_name, last_name FROM customers WHERE id = $1", // is_enabled/is_deleted/ or something
+            customer_id as i64
+        )
+        .fetch_one(pool)
+        .await;
+        match result {
+            Ok(customer) => Ok(ProfileCustomer {
+                id: customer.id,
+                email: customer.email,
+                first_name: customer.first_name.expect("Empty First Name"),
+                last_name: customer.last_name.expect("Empty Last Name"),
+            }),
+            Err(e) => Err(e),
+        }
+    }
     pub async fn create_customer(pool: &PgPool, new_customer: NewCustomer) -> Result<i32, Error> {
         let hashed_pwd = hash(&new_customer.password, DEFAULT_COST).unwrap();
         let date_time = new_customer
@@ -37,10 +57,7 @@ impl CustomerRepository {
 
         match result {
             Ok(result) => Ok(result.id as i32),
-            Err(e) => {
-                eprintln!("{}", e);
-                Err(e)
-            }
+            Err(e) => Err(e),
         }
     }
 }

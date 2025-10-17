@@ -1,4 +1,4 @@
-use chrono::{NaiveDate};
+use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -30,4 +30,12 @@ pub struct NewCustomer {
 #[derive(Deserialize, Serialize, Debug)]
 pub struct Customer {
     pub(crate) id: i32,
+}
+
+#[derive(Clone, Deserialize, Serialize, Debug)]
+pub struct ProfileCustomer {
+    pub(crate) id: i64,
+    pub(crate) email: String,
+    pub(crate) first_name: String,
+    pub(crate) last_name: String,
 }

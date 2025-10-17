@@ -5,14 +5,15 @@ mod models;
 mod repository;
 mod router;
 mod views;
+mod services;
 
 use crate::config::config;
 use crate::router::create_router;
 use minijinja::Environment;
 use simple_cookie::SigningKey;
 
-#[tokio::main(flavor = "multi_thread", worker_threads = 10)]
-// #[tokio::main]
+// #[tokio::main(flavor = "multi_thread", worker_threads = 10)]
+#[tokio::main]
 async fn main() {
     let (port, addr, pool, static_files) = config().await;
 
