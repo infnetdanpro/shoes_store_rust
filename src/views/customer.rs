@@ -25,12 +25,9 @@ pub async fn post_customer_registration_page(
     Form(customer): Form<NewCustomer>,
 ) -> impl IntoResponse {
     let mut form_errors = HashMap::new();
-    match customer.accept_all {
-        AcceptEnum::Off => {
-            // field/error
-            form_errors.insert("accept_all", "Required field!");
-        }
-        _ => {}
+
+    if let AcceptEnum::Off = customer.accept_all {
+        form_errors.insert("accept_all", "Required field!");
     }
 
     let customer_id = CustomerRepository::create_customer(&pool, customer).await;

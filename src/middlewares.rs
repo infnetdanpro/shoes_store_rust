@@ -41,7 +41,7 @@ fn extract_user_id(
     if let Some(cookie_headers) = header_map.get("cookie") {
         let ch = cookie_headers.to_str();
         match ch {
-            Ok(ch) => match AuthService::parse_cookie_value(&ch, signing_key) {
+            Ok(ch) => match AuthService::parse_cookie_value(ch, signing_key) {
                 Ok(id) => Ok(Customer { id }),
                 Err(e) => Err((
                     StatusCode::UNAUTHORIZED,

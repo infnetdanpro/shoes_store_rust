@@ -92,7 +92,7 @@ pub async fn get_products_by_category_name(
     let template = state.tpl_env.get_template("products.html").unwrap();
     let mut path_url = String::from("category/");
     let cat_name = category_name.clone().expect("men");
-    path_url.push_str(&cat_name.as_str()); // TODO: clone?
+    path_url.push_str(cat_name.as_str()); // TODO: clone?
 
     let r = template
         .render(context!(
