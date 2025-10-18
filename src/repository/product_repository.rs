@@ -1,4 +1,4 @@
-use crate::models::products::{FullProduct, Product, ProductsWithCategory};
+use crate::models::products::{FullProduct, Product, ProductsWithCategory, SumProduct};
 use sqlx::{PgPool, Row};
 use std::collections::HashMap;
 
@@ -209,6 +209,23 @@ from products where code = $1;",
             rating: product.get("rating"),
             code: product.get("code"),
             images: product.get("images"),
+        })
+    }
+
+    pub async fn get_product_by_id(
+        product_id: i32,
+        pool: &PgPool,
+    ) -> Result<SumProduct, sqlx::Error> {
+        let product = sqlx::query(
+            "select id, price::integer from products where id = $1;",
+        )
+            .bind(product_id)
+            .fetch_one(pool)
+            .await?;
+
+        Ok(SumProduct {
+            id: product.get("id"),
+            price: product.get("price"),
         })
     }
 }

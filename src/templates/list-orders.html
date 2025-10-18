@@ -23,36 +23,29 @@
                 There was an error creating your order. Send this problem to the support or try again later.
             </div>
             {% endif %}
-            {{ products_order }}
             <div class="col-lg-12">
                 <table class="table">
                     <thead>
                     <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">First</th>
-                        <th scope="col">Last</th>
-                        <th scope="col">Handle</th>
+                        <th scope="col">Order Products</th>
+                        <th scope="col">Sum</th>
+                        <th scope="col">Status</th>
                     </tr>
                     </thead>
                     <tbody>
+                    {% for order_uuid in order_products %}
                     <tr>
-                        <th scope="row">1</th>
-                        <td>Mark</td>
-                        <td>Otto</td>
-                        <td>@mdo</td>
+                        <td><a href="/order/{{ order_uuid }}">Products ({{ order_products[order_uuid] | length }})</a>
+                            <ul>
+                            {% for p in order_products[order_uuid] %}
+                                <li> - <small><a href="/product/{{ p.product_code }}">{{ p.product_name}}</a></small></li>
+                            {% endfor %}
+                            </ul>
+                        </td>
+                        <td>$ {{ orders_sums[order_uuid] }}</td>
+                        <td>{{ order_statuses[order_uuid] }}</td>
                     </tr>
-                    <tr>
-                        <th scope="row">2</th>
-                        <td>Jacob</td>
-                        <td>Thornton</td>
-                        <td>@fat</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">3</th>
-                        <td>Larry</td>
-                        <td>the Bird</td>
-                        <td>@twitter</td>
-                    </tr>
+                    {% endfor %}
                     </tbody>
                 </table>
             </div>

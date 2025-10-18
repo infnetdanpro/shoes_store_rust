@@ -15,3 +15,10 @@ pub struct CreatedOrder {
     pub(crate) product_ids: Vec<i32>,
     pub(crate) created_at: NaiveDateTime,
 }
+
+
+// #[derive(Debug, Serialize, Deserialize)]
+// pub struct Order {
+//     pub(crate) order_id: String, // uuid
+//     pub(crate) product_ids: Vec<i32>,
+// }

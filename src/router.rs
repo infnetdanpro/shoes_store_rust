@@ -4,7 +4,7 @@ use crate::views::{
     about::about, customer::get_customer_login_page, customer::get_customer_registration_page,
     customer::get_profile_customer_page, customer::logout_customer,
     customer::post_customer_login_page, customer::post_customer_registration_page, home::home,
-    order::get_order_by_uuid_and_customer, order::post_add_product_to_cart,
+    order::get_list_orders, order::get_order_by_uuid_and_customer, order::post_add_product_to_cart,
     products::get_product_by_code, products::get_products, products::get_products_by_category_name,
 };
 use axum::routing::{get, post};
@@ -24,6 +24,7 @@ pub fn create_router(
     let auth_routes = Router::new()
         .route("/profile", get(get_profile_customer_page))
         .route("/order", post(post_add_product_to_cart))
+        .route("/my-orders", get(get_list_orders))
         .layer(middleware::from_fn(extract_user_id_from_cookie));
 
     let non_auth_routes = Router::new()

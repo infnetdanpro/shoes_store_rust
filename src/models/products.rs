@@ -50,3 +50,20 @@ pub struct FullProduct {
     pub(crate) code: String,
     pub(crate) images: Json<Vec<String>>,
 }
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct SumProduct {
+    // render product
+    pub(crate) id: i32,
+    pub(crate) price: i32,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct OrderProductInfo {
+    pub(crate) order_id: String,
+    pub(crate) product_id: i32,
+    pub(crate) product_price: i32,
+    pub(crate) product_name: String,
+    pub(crate) product_code: String,
+    pub(crate) order_status: Option<String>,
+}
