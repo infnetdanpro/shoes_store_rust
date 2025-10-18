@@ -4,8 +4,8 @@ mod middlewares;
 mod models;
 mod repository;
 mod router;
-mod views;
 mod services;
+mod views;
 
 use crate::config::config;
 use crate::router::create_router;
@@ -15,6 +15,8 @@ use simple_cookie::SigningKey;
 // #[tokio::main(flavor = "multi_thread", worker_threads = 10)]
 #[tokio::main]
 async fn main() {
+    tracing_subscriber::fmt::init();
+
     let (port, addr, pool, static_files) = config().await;
 
     let mut env = Environment::new();
@@ -34,7 +36,7 @@ async fn main() {
     let tcp_listener = tokio::net::TcpListener::bind(format!("{addr}:{port}"))
         .await
         .unwrap();
-    println!("Listening on http://{}:{}", addr, port);
+    tracing::info!("Starting server on {}:{}", addr, port);
     axum::serve(tcp_listener, app_router.into_make_service())
         .await
         .unwrap();
