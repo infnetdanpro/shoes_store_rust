@@ -1,9 +1,10 @@
 use crate::models::customer::{NewCustomer, ProfileCustomer};
-use bcrypt::{DEFAULT_COST, hash};
+use bcrypt::{DEFAULT_COST, hash, verify};
 use chrono::{NaiveDate, NaiveTime};
+use serde::Serialize;
 use sqlx::PgPool;
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub enum CustomerError {
     Database,
     HashingError,
@@ -99,5 +100,53 @@ impl CustomerRepository {
         .await?;
 
         Ok(result.id)
+    }
+
+    pub async fn get_user_by_email_password(
+        pool: &PgPool,
+        email: String,
+        password: String,
+        confirm_password: String,
+    ) -> Result<ProfileCustomer, CustomerError> {
+        if password != confirm_password {
+            return Err(CustomerError::MissingData(
+                "Passwords do not match".to_string(),
+            ));
+        }
+
+        let customer = sqlx::query!("SELECT id, email, first_name, last_name, date_birth, phone, city, country, password FROM customers WHERE email = $1", email).fetch_one(pool).await?;
+
+        let stored_password = customer
+            .password
+            .ok_or_else(|| CustomerError::MissingData("Password is required".to_string()))?;
+
+        let is_same_pwd =
+            verify(&password, &stored_password).map_err(|_| CustomerError::HashingError)?;
+
+        if !is_same_pwd {
+            return Err(CustomerError::MissingData("Invalid password".to_string()));
+        }
+
+        Ok(ProfileCustomer {
+            is_authenticated: true,
+            id: customer.id,
+            email: customer.email,
+            first_name: customer
+                .first_name
+                .ok_or_else(|| CustomerError::MissingData("First Name is required".to_string()))?,
+            last_name: customer
+                .last_name
+                .ok_or_else(|| CustomerError::MissingData("Last Name is required".to_string()))?,
+            date_birth: NaiveDate::from(customer.date_birth),
+            phone: customer
+                .phone
+                .ok_or_else(|| CustomerError::MissingData("phone is required".to_string()))?,
+            city: customer
+                .city
+                .ok_or_else(|| CustomerError::MissingData("city is required".to_string()))?,
+            country: customer
+                .country
+                .ok_or_else(|| CustomerError::MissingData("country is required".to_string()))?,
+        })
     }
 }

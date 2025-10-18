@@ -32,6 +32,13 @@ pub struct Customer {
     pub(crate) id: i64,
 }
 
+#[derive(Deserialize, Serialize, Debug)]
+pub struct CustomerLoginPostForm {
+    pub(crate) email: String,
+    pub(crate) password: String,
+    pub(crate) confirm_password: String,
+}
+
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ProfileCustomer {
     pub(crate) is_authenticated: bool,

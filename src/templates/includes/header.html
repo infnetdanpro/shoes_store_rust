@@ -23,21 +23,22 @@
                                 <li><a href="contact.html">Contact Us</a></li>
                             </ul>
                         </li>
+<!--                        <li class="submenu">-->
+<!--                            <a href="javascript:;">Features</a>-->
+<!--                            <ul>-->
+<!--                                <li><a href="#">Features Page 1</a></li>-->
+<!--                                <li><a href="#">Features Page 2</a></li>-->
+<!--                                <li><a href="#">Features Page 3</a></li>-->
+<!--                                <li><a rel="nofollow" href="https://templatemo.com/page/4" target="_blank">Template Page 4</a></li>-->
+<!--                            </ul>-->
+<!--                        </li>-->
+                        {% if customer_user and customer_user.is_authenticated %}
                         <li class="submenu">
-                            <a href="javascript:;">Features</a>
+                            <a href="javascript:;">{{ customer_user.email }}</a>
                             <ul>
-                                <li><a href="#">Features Page 1</a></li>
-                                <li><a href="#">Features Page 2</a></li>
-                                <li><a href="#">Features Page 3</a></li>
-                                <li><a rel="nofollow" href="https://templatemo.com/page/4" target="_blank">Template Page 4</a></li>
-                            </ul>
-                        </li>
-                        {% if customer_user %}
-                        <li class="submenu">
-                            <a href="/profile">{{ customer_user.email }}</a>
-                            <ul>
+                                <li><a href="/profile">Profile</a></li>
                                 <li><a href="#">Change password</a></li>
-                                <li><a href="#">Logout</a></li>
+                                <li><a href="/logout">Logout</a></li>
                             </ul>
                         </li>
                         {% else %}

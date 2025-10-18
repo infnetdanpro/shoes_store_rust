@@ -25,6 +25,7 @@ pub async fn optional_customer(
             Err(e) => Err((StatusCode::INTERNAL_SERVER_ERROR, format!("{:?}", e))),
         },
         Err((_, _)) => {
+            // No Errors because we sent empty non-authed ProfileCustomer
             req.extensions_mut().insert(ProfileCustomer {
                 is_authenticated: false,
                 id: 0,

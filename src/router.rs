@@ -1,11 +1,13 @@
 use crate::middlewares::{extract_user_id_from_cookie, optional_customer, redirect_if_authed};
 use crate::models::state::AppState;
 use crate::views::{
-    about::about, customer::get_customer_registration_page, customer::get_profile_customer_page,
-    customer::post_customer_registration_page, home::home, order::get_order_by_uuid_and_customer,
-    products::get_product_by_code, products::get_products, products::get_products_by_category_name,
+    about::about, customer::get_customer_login_page, customer::get_customer_registration_page,
+    customer::get_profile_customer_page, customer::logout_customer,
+    customer::post_customer_login_page, customer::post_customer_registration_page, home::home,
+    order::get_order_by_uuid_and_customer, products::get_product_by_code, products::get_products,
+    products::get_products_by_category_name,
 };
-use axum::routing::get;
+use axum::routing::{get, post};
 use axum::{Extension, Router, middleware};
 use minijinja::Environment;
 use simple_cookie::SigningKey;
@@ -28,11 +30,13 @@ pub fn create_router(
             "/register",
             get(get_customer_registration_page).post(post_customer_registration_page),
         )
+        .route("/login", get(get_customer_login_page))
         .layer(middleware::from_fn(redirect_if_authed));
 
     Router::new()
         .route("/", get(home))
         .route("/about", get(about))
+        .route("/logout", get(logout_customer))
         .route("/products", get(get_products))
         .route(
             "/category/{category_name}",
@@ -40,8 +44,8 @@ pub fn create_router(
         )
         .route("/product/{code}", get(get_product_by_code))
         .route("/order/{order_uuid}", get(get_order_by_uuid_and_customer))
+        .route("/login", post(post_customer_login_page))
         // .route("/order", post())
-        // .route("/login", get(get_customer_registration_page))
         .merge(protected_routes)
         .merge(non_auth_routes)
         .layer((

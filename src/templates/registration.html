@@ -19,6 +19,17 @@
     <div class="container">
         <div class="row">
             <div class="col-lg-8">
+                {% if is_register_ok %}
+                <script>
+                    window.setTimeout(function(){
+                        window.location.href = "/";
+                    }, 5000);
+                </script>
+                <div class="alert alert-success" role="alert">
+                    You are registered!. You will be redirected to the main page in 5 seconds. If not, click <a href="/">here</a>.
+                </div>
+                {% endif %}
+
                 {% if form_errors and form_errors.error %}
                 <div class="alert alert-danger" role="alert">
                     {{ form_errors.error }}
