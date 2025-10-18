@@ -9,6 +9,24 @@ use axum::response::Response;
 use simple_cookie::SigningKey;
 use sqlx::PgPool;
 
+pub async fn redirect_if_authed(
+    headers: HeaderMap,
+    Extension(signing_key): Extension<SigningKey>,
+    req: Request,
+    next: Next,
+) -> Response {
+    let result = extract_user_id(&headers, signing_key);
+    match result {
+        Ok(_) => {
+            let mut res = next.run(req).await;
+            res.headers_mut().insert("Location", "/".parse().unwrap());
+            *res.status_mut() = StatusCode::PERMANENT_REDIRECT;
+            res
+        }
+        Err(_) => next.run(req).await,
+    }
+}
+
 pub async fn extract_user_id_from_cookie(
     headers: HeaderMap,
     Extension(signing_key): Extension<SigningKey>,
@@ -17,16 +35,13 @@ pub async fn extract_user_id_from_cookie(
     next: Next,
 ) -> Result<Response, (StatusCode, String)> {
     match extract_user_id(&headers, signing_key) {
-        Ok(customer) => {
-            req.extensions_mut().insert(customer.id);
-            match CustomerRepository::verify_customer(&pool, customer.id).await {
-                Ok(customer) => {
-                    req.extensions_mut().insert(customer);
-                    Ok(next.run(req).await)
-                }
-                Err(e) => Err((StatusCode::INTERNAL_SERVER_ERROR, format!("{:?}", e))),
+        Ok(customer) => match CustomerRepository::verify_customer(&pool, customer.id).await {
+            Ok(customer) => {
+                req.extensions_mut().insert(customer);
+                Ok(next.run(req).await)
             }
-        }
+            Err(e) => Err((StatusCode::INTERNAL_SERVER_ERROR, format!("{:?}", e))),
+        },
         Err((status, _)) => Err((
             status,
             String::from("Failed to extract user id from cookie"),

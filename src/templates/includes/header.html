@@ -32,7 +32,12 @@
                                 <li><a rel="nofollow" href="https://templatemo.com/page/4" target="_blank">Template Page 4</a></li>
                             </ul>
                         </li>
-                        <li class="scroll-to-section"><a href="#explore">Explore</a></li>
+                        {% if customer_user %}
+                        <li class="scroll-to-section"><a href="/profile">{{ customer_user.email }}</a></li>
+                        {% else %}
+                        <li class="scroll-to-section"><a href="/login">Login</a></li>
+                        <li class="scroll-to-section"><a href="/register">Register</a></li>
+                        {% endif %}
                     </ul>
                     <a class='menu-trigger'>
                         <span>Menu</span>

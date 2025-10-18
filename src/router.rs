@@ -1,4 +1,4 @@
-use crate::middlewares::extract_user_id_from_cookie;
+use crate::middlewares::{extract_user_id_from_cookie, redirect_if_authed};
 use crate::models::state::AppState;
 use crate::views::{
     about::about, customer::get_customer_registration_page, customer::get_profile_customer_page,
@@ -22,6 +22,14 @@ pub fn create_router(
     let protected_routes = Router::new()
         .route("/profile", get(get_profile_customer_page))
         .layer(middleware::from_fn(extract_user_id_from_cookie));
+
+    let non_auth_routes = Router::new()
+        .route(
+            "/register",
+            get(get_customer_registration_page).post(post_customer_registration_page),
+        )
+        .layer(middleware::from_fn(redirect_if_authed));
+
     Router::new()
         .route("/", get(home))
         .route("/about", get(about))
@@ -33,13 +41,10 @@ pub fn create_router(
         .route("/product/{code}", get(get_product_by_code))
         .route("/order/{order_uuid}", get(get_order_by_uuid_and_customer))
         // .route("/order", post())
-        .route(
-            "/register",
-            get(get_customer_registration_page).post(post_customer_registration_page),
-        )
         // .route("/login", get(get_customer_registration_page))
         .merge(protected_routes)
+        .merge(non_auth_routes)
         .layer((Extension(pool), Extension(signing_key)))
         .with_state(Arc::new(AppState { tpl_env: env }))
-        .nest_service("/static", static_files)
+        .nest_service("/static", static_files) // pass it via nginx on production
 }

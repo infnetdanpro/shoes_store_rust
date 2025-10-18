@@ -28,6 +28,7 @@ pub struct NewCustomer {
 }
 
 #[derive(Deserialize, Serialize, Debug)]
+#[derive(Clone)]
 pub struct Customer {
     pub(crate) id: i64,
 }
