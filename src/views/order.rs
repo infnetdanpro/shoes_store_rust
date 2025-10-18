@@ -11,7 +11,7 @@ pub async fn get_order_by_uuid_and_customer(
     State(state): State<Arc<AppState>>,
     Extension(customer_user): Extension<ProfileCustomer>,
 ) -> Html<String> {
-    println!("order_uuid: {}", order_uuid);// todo: create it
+    tracing::info!("order_uuid: {}", order_uuid);
     let template = state.tpl_env.get_template("orders.html").unwrap();
     let r = template
         .render(context!(customer_user => customer_user))
