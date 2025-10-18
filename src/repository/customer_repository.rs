@@ -1,6 +1,6 @@
 use crate::models::customer::{NewCustomer, ProfileCustomer};
 use bcrypt::{DEFAULT_COST, hash};
-use chrono::NaiveTime;
+use chrono::{NaiveDate, NaiveTime};
 use sqlx::PgPool;
 
 #[derive(Debug)]
@@ -33,11 +33,11 @@ pub struct CustomerRepository;
 impl CustomerRepository {
     pub async fn verify_customer(
         pool: &PgPool,
-        customer_id: i32,
+        customer_id: i64,
     ) -> Result<ProfileCustomer, CustomerError> {
         let customer = sqlx::query!(
-            "SELECT id, email, first_name, last_name FROM customers WHERE id = $1", // is_enabled/is_deleted/ or something
-            customer_id as i64
+            "SELECT id, email, first_name, last_name, date_birth, phone, city, country FROM customers WHERE id = $1", // is_enabled/is_deleted/ or something
+            customer_id
         )
         .fetch_one(pool)
         .await?;
@@ -51,6 +51,16 @@ impl CustomerRepository {
             last_name: customer
                 .last_name
                 .ok_or_else(|| CustomerError::MissingData("Last Name is required".to_string()))?,
+            date_birth: NaiveDate::from(customer.date_birth),
+            phone: customer
+                .phone
+                .ok_or_else(|| CustomerError::MissingData("phone is required".to_string()))?,
+            city: customer
+                .city
+                .ok_or_else(|| CustomerError::MissingData("city is required".to_string()))?,
+            country: customer
+                .country
+                .ok_or_else(|| CustomerError::MissingData("country is required".to_string()))?,
         })
     }
 

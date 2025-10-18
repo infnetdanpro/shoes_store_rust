@@ -29,13 +29,18 @@ pub struct NewCustomer {
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct Customer {
-    pub(crate) id: i32,
+    pub(crate) id: i64,
 }
 
-#[derive(Clone, Deserialize, Serialize, Debug)]
+#[derive(Serialize, Deserialize, Debug)]
+#[derive(Clone)]
 pub struct ProfileCustomer {
     pub(crate) id: i64,
     pub(crate) email: String,
     pub(crate) first_name: String,
     pub(crate) last_name: String,
+    pub(crate) date_birth: NaiveDate,
+    pub(crate) phone: String,
+    pub(crate) city: String,
+    pub(crate) country: String,
 }

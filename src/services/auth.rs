@@ -4,7 +4,11 @@ pub struct AuthService;
 
 impl AuthService {
     pub fn create_cookie_header(customer_id: i64, signing_key: &SigningKey) -> String {
-        let encoded = encode_cookie(*signing_key, "customer_id", customer_id.to_le_bytes());
+        let encoded = encode_cookie(
+            *signing_key,
+            "customer_id",
+            customer_id.to_le_bytes().to_vec(),
+        );
 
         let cookie_value = format!(
             "PHPSESSID={}; HttpOnly; Secure; SameSite=Strict; Max-Age=86400",
@@ -12,7 +16,7 @@ impl AuthService {
         );
         cookie_value
     }
-    pub fn parse_cookie_value(cookie_value: &str, signing_key: SigningKey) -> Result<i32, String> {
+    pub fn parse_cookie_value(cookie_value: &str, signing_key: SigningKey) -> Result<i64, String> {
         // cookie_value = "PHPSESSID=fedkhbbkiagplcgmamicbhlgankcjgbdimhbpjifchimbbhihbbfpcdbdkebedkp"
         let cookie_pairs = cookie_value.split(';').next().unwrap();
 
@@ -20,9 +24,9 @@ impl AuthService {
             && name.trim() == "PHPSESSID"
             && let Ok(decoded) = decode_cookie(signing_key, "customer_id", value)
         {
-            return if decoded.len() == 4 {
-                let bytes: [u8; 4] = decoded.try_into().unwrap();
-                let customer_id = i32::from_le_bytes(bytes);
+            return if decoded.len() == 8 {
+                let bytes: [u8; 8] = decoded.try_into().unwrap();
+                let customer_id = i64::from_le_bytes(bytes);
                 Ok(customer_id)
             } else {
                 Err("Failed to decode cookie".to_string())

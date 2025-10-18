@@ -57,9 +57,9 @@ pub async fn post_customer_registration_page(
 
 pub async fn get_profile_customer_page(
     State(state): State<Arc<AppState>>,
-    Extension(_authed_customer): Extension<ProfileCustomer>,
+    Extension(authed_customer): Extension<ProfileCustomer>,
 ) -> Html<String> {
-    let template = state.tpl_env.get_template("index.html").unwrap();
-    let r = template.render(context!()).unwrap();
+    let template = state.tpl_env.get_template("profile.html").unwrap();
+    let r = template.render(context!(customer => authed_customer)).unwrap();
     Html(r)
 }
