@@ -1,4 +1,4 @@
-use crate::middlewares::{extract_user_id_from_cookie, redirect_if_authed};
+use crate::middlewares::{extract_user_id_from_cookie, optional_customer, redirect_if_authed};
 use crate::models::state::AppState;
 use crate::views::{
     about::about, customer::get_customer_registration_page, customer::get_profile_customer_page,
@@ -44,7 +44,11 @@ pub fn create_router(
         // .route("/login", get(get_customer_registration_page))
         .merge(protected_routes)
         .merge(non_auth_routes)
-        .layer((Extension(pool), Extension(signing_key)))
+        .layer((
+            Extension(pool),
+            Extension(signing_key),
+            middleware::from_fn(optional_customer),
+        ))
         .with_state(Arc::new(AppState { tpl_env: env }))
         .nest_service("/static", static_files) // pass it via nginx on production
 }

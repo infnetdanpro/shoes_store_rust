@@ -33,34 +33,34 @@
                         </div>
                         {% endif %}
                         <label for="email">Email address</label>
-                        <input type="email" class="form-control" id="email" aria-describedby="emailHelp" name="email" value = "{{ customer.email }}"
+                        <input type="email" class="form-control" id="email" aria-describedby="emailHelp" name="email" value = "{{ customer_user.email }}"
                                required>
                         <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone
                             else.</small>
                     </div>
                     <div class="form-group">
                         <label for="date_birth">Date birth</label>
-                        <input type="date" class="form-control" id="date_birth" name="date_birth" value = "{{ customer.date_birth }}">
+                        <input type="date" class="form-control" id="date_birth" name="date_birth" value = "{{ customer_user.date_birth }}">
                     </div>
                     <div class="form-group">
                         <label for="first_name">First name</label>
-                        <input type="text" class="form-control" id="first_name" name="first_name" value = "{{ customer.first_name }}">
+                        <input type="text" class="form-control" id="first_name" name="first_name" value = "{{ customer_user.first_name }}">
                     </div>
                     <div class="form-group">
                         <label for="last_name">Last name</label>
-                        <input type="text" class="form-control" id="last_name" name="last_name" value = "{{ customer.last_name }}">
+                        <input type="text" class="form-control" id="last_name" name="last_name" value = "{{ customer_user.last_name }}">
                     </div>
                     <div class="form-group">
                         <label for="phone">Phone</label>
-                        <input type="text" class="form-control" id="phone" name="phone" value = "{{ customer.phone }}">
+                        <input type="text" class="form-control" id="phone" name="phone" value = "{{ customer_user.phone }}">
                     </div>
                     <div class="form-group">
                         <label for="city">City</label>
-                        <input type="text" class="form-control" id="city" name="city" value = "{{ customer.city }}">
+                        <input type="text" class="form-control" id="city" name="city" value = "{{ customer_user.city }}">
                     </div>
                     <div class="form-group">
                         <label for="country">Country</label>
-                        <input type="text" class="form-control" id="country" name="country" value = "{{ customer.country }}">
+                        <input type="text" class="form-control" id="country" name="country" value = "{{ customer_user.country }}">
                     </div>
                     <button type="submit" class="btn btn-primary">Update profile</button>
                 </form>

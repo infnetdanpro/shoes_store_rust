@@ -7,11 +7,13 @@ use axum::response::Html;
 use minijinja::context;
 use sqlx::PgPool;
 use std::sync::Arc;
+use crate::models::customer::ProfileCustomer;
 
 pub async fn get_products(
     pagination: Query<Pagination>,
     State(state): State<Arc<AppState>>,
     Extension(pool): Extension<PgPool>,
+    Extension(customer_user): Extension<ProfileCustomer>,
 ) -> Html<String> {
     let pagination = pagination.0;
     let limit = 9;
@@ -41,6 +43,7 @@ pub async fn get_products(
     let template = state.tpl_env.get_template("products.html").unwrap();
     let r = template
         .render(context!(
+            customer_user => customer_user,
             url => path_url,
             products => ctx_products,
             current_page => current_page,
@@ -60,6 +63,7 @@ pub async fn get_products_by_category_name(
     pagination: Query<Pagination>,
     State(state): State<Arc<AppState>>,
     Extension(pool): Extension<PgPool>,
+    Extension(customer_user): Extension<ProfileCustomer>,
 ) -> Html<String> {
     let pagination = pagination.0;
     let limit = 9;
@@ -96,6 +100,7 @@ pub async fn get_products_by_category_name(
 
     let r = template
         .render(context!(
+            customer_user => customer_user,
             url => path_url,
             category_name => category_name,
             category_description => category_description,
@@ -116,11 +121,12 @@ pub async fn get_product_by_code(
     Path(code): Path<String>,
     State(state): State<Arc<AppState>>,
     Extension(pool): Extension<PgPool>,
+    Extension(customer_user): Extension<ProfileCustomer>,
 ) -> Html<String> {
     let ctx_product = ProductRepository::get_product_by_code(&code, &pool)
         .await
         .unwrap();
     let template = state.tpl_env.get_template("single-product.html").unwrap();
-    let r = template.render(context!(product => ctx_product)).unwrap();
+    let r = template.render(context!(product => ctx_product, customer_user => customer_user)).unwrap();
     Html(r)
 }

@@ -1,4 +1,4 @@
-use crate::models::customer::Customer;
+use crate::models::customer::{Customer, ProfileCustomer};
 use crate::repository::customer_repository::CustomerRepository;
 use crate::services::auth::AuthService;
 use axum::Extension;
@@ -8,6 +8,38 @@ use axum::middleware::Next;
 use axum::response::Response;
 use simple_cookie::SigningKey;
 use sqlx::PgPool;
+
+pub async fn optional_customer(
+    headers: HeaderMap,
+    Extension(signing_key): Extension<SigningKey>,
+    Extension(pool): Extension<PgPool>,
+    mut req: Request,
+    next: Next,
+) -> Result<Response, (StatusCode, String)> {
+    match extract_user_id(&headers, signing_key) {
+        Ok(customer) => match CustomerRepository::verify_customer(&pool, customer.id).await {
+            Ok(customer) => {
+                req.extensions_mut().insert(customer);
+                Ok(next.run(req).await)
+            }
+            Err(e) => Err((StatusCode::INTERNAL_SERVER_ERROR, format!("{:?}", e))),
+        },
+        Err((_, _)) => {
+            req.extensions_mut().insert(ProfileCustomer {
+                is_authenticated: false,
+                id: 0,
+                email: "".to_string(),
+                first_name: "".to_string(),
+                last_name: "".to_string(),
+                date_birth: Default::default(),
+                phone: "".to_string(),
+                city: "".to_string(),
+                country: "".to_string(),
+            });
+            Ok(next.run(req).await)
+        }
+    }
+}
 
 pub async fn redirect_if_authed(
     headers: HeaderMap,

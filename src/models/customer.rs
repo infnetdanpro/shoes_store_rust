@@ -27,15 +27,14 @@ pub struct NewCustomer {
     pub(crate) accept_all: AcceptEnum,
 }
 
-#[derive(Deserialize, Serialize, Debug)]
-#[derive(Clone)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct Customer {
     pub(crate) id: i64,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
-#[derive(Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ProfileCustomer {
+    pub(crate) is_authenticated: bool,
     pub(crate) id: i64,
     pub(crate) email: String,
     pub(crate) first_name: String,

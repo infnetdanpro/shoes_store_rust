@@ -43,6 +43,7 @@ impl CustomerRepository {
         .await?;
 
         Ok(ProfileCustomer {
+            is_authenticated: true,
             id: customer.id,
             email: customer.email,
             first_name: customer
