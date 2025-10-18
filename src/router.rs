@@ -4,8 +4,8 @@ use crate::views::{
     about::about, customer::get_customer_login_page, customer::get_customer_registration_page,
     customer::get_profile_customer_page, customer::logout_customer,
     customer::post_customer_login_page, customer::post_customer_registration_page, home::home,
-    order::get_order_by_uuid_and_customer, products::get_product_by_code, products::get_products,
-    products::get_products_by_category_name,
+    order::get_order_by_uuid_and_customer, order::post_add_product_to_cart,
+    products::get_product_by_code, products::get_products, products::get_products_by_category_name,
 };
 use axum::routing::{get, post};
 use axum::{Extension, Router, middleware};
@@ -21,8 +21,9 @@ pub fn create_router(
     env: Environment<'static>,
     signing_key: SigningKey,
 ) -> Router {
-    let protected_routes = Router::new()
+    let auth_routes = Router::new()
         .route("/profile", get(get_profile_customer_page))
+        .route("/order", post(post_add_product_to_cart))
         .layer(middleware::from_fn(extract_user_id_from_cookie));
 
     let non_auth_routes = Router::new()
@@ -46,7 +47,7 @@ pub fn create_router(
         .route("/order/{order_uuid}", get(get_order_by_uuid_and_customer))
         .route("/login", post(post_customer_login_page))
         // .route("/order", post())
-        .merge(protected_routes)
+        .merge(auth_routes)
         .merge(non_auth_routes)
         .layer((
             Extension(pool),
